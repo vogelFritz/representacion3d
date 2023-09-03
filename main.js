@@ -1,9 +1,10 @@
 const grafico = document.querySelector('.grafico');
+const angGiro = 0.08819;
 let puntosR3 = [],
     puntosR2 = [];
 
-const posGraficoY = ( y ) => grafico.offsetHeight / 2. + y;
-const posGraficoX = ( x ) => grafico.offsetWidth / 2. + x;
+const posGraficoY = ( y ) => grafico.offsetHeight / 2. - y;
+const posGraficoX = ( x ) => grafico.offsetWidth / 2. - x;
 
 class PuntoR3 {
     x;
@@ -16,6 +17,34 @@ class PuntoR3 {
     }
 }
 
+const convertirAUnitario = ( vec ) => {
+    const aux = Math.sqrt( 1. / (vec.x ** 2. + vec.y ** 2. + vec.z ** 2.) );
+    let vecUnitario = new PuntoR3(vec.x * aux, vec.y * aux, vec.z * aux);
+    return vecUnitario;
+}
+
+const prodConEscalar = ( vec, k ) => {
+    let vecRes = new PuntoR3( vec.x * k, vec.y * k, vec.z * k );
+    return vecRes;
+}
+
+const prodVectorial = ( vec1, vec2 ) => {
+    return new PuntoR3( vec1.y * vec2.z - vec1.z * vec2.y, vec2.x * vec1.z - vec2.z * vec1.x, vec1.x * vec2.y - vec1.y * vec2.x );
+}
+
+const sumaVec = ( vec1, vec2 ) => {
+    return new PuntoR3( vec1.x + vec2.x, vec1.y + vec2.y, vec1.z + vec2.z );
+}
+
+const moduloVector = ( vec ) => {
+    return Math.sqrt( vec.x ** 2. + vec.y **2. + vec.z **2. );
+} 
+
+const vectorOpuesto = ( vec ) => {
+    return new PuntoR3( -vec.x, -vec.y,  -vec.z );
+}
+
+
 class Observador {
     pos; // PuntoR3
     dir; // PuntoR3 (ojo, tiene que ser unitario)
@@ -25,9 +54,9 @@ class Observador {
     }
 }
 
-let obs = new Observador( new PuntoR3(0, 0, 12), new PuntoR3(1, 0, 0) ),
-      u   = new PuntoR3(0,1,0),
-      v   = new PuntoR3(0,0,1);
+let obs = new Observador( new PuntoR3(5, 0, 30), new PuntoR3(0, 0, -1) ),
+      u   = new PuntoR3(1,0,0),
+      v   = new PuntoR3(0,1,0);
 
 
 class PuntoR2 {
@@ -87,25 +116,58 @@ class LineaR2 {
     }
 }
 
-const A = new PuntoR3(3,1,0),
-      B = new PuntoR3(3,-2,0),
-      C = new PuntoR3(5,-0.5,0),
-      D = new PuntoR3(4,-1,4),
-      AP = new PuntoR2( A ),
-      BP = new PuntoR2( B ),
-      CP = new PuntoR2( C ),
-      DP = new PuntoR2( D ),
-      linea1 = new LineaR2(AP, BP),
-      linea2 = new LineaR2(AP, CP),
-      linea3 = new LineaR2(AP, DP),
-      linea4 = new LineaR2(BP, CP),
-      linea5 = new LineaR2(BP, DP),
-      linea6 = new LineaR2(CP, DP);
+const renderR2 = () => {
+    grafico.replaceChildren('');
+    puntosR2 = [];
+    puntosR3.forEach( (elem) => {
+        puntosR2.push( new PuntoR2(elem) );
+    });
+    for(let i = 0; i < puntosR2.length - 1; i++) {
+        for( let j = 0; j < puntosR2.length; j++ )
+            new LineaR2( puntosR2[i], puntosR2[j] );
+    }
+}
 
-      puntosR3.push(A, B, C, D);
+const crearPlano = ( ptoInicial ) => {
+    const lado = 10;
+    puntosR3.push( ptoInicial );
+    puntosR3.push( new PuntoR3( ptoInicial.x, ptoInicial.y + lado, ptoInicial.z ) );
+    puntosR3.push( new PuntoR3( ptoInicial.x, ptoInicial.y, ptoInicial.z + lado ) );
+    puntosR3.push( new PuntoR3( ptoInicial.x, ptoInicial.y + lado, ptoInicial.z + lado ) );
+}
+
+crearPlano( new PuntoR3(0,0,0) );
+renderR2();
+
+const girarArriba = () => {
+    const vecGiro = prodConEscalar(v, angGiro);
+    obs.dir = sumaVec( obs.dir, vecGiro );
+    obs.dir = convertirAUnitario( obs.dir );
+    v = prodVectorial( obs.dir, u );
+}
+const girarAbajo = () => {
+    
+}
+const girarIzq = () => {
+
+}
+const girarDer = () => {
+
+}
 
 
-console.log(puntosR3);
+grafico.addEventListener("keydown", (e) => {
+    switch(e.key) {
+        case 'ArrowUp': girarArriba();
+            break;
+        case 'ArrowDown': girarAbajo();
+            break;
+        case 'ArrowLeft': girarIzq();
+            break;
+        case 'ArrowRight': girarDer();
+            break;
+    }
+});
 
 const acercarse = () => {
     const h = 0.0167,
@@ -113,20 +175,13 @@ const acercarse = () => {
     let t = 0;
     for( let i = 0; i < 1000; i++ ) {
         setTimeout(() => {
-            grafico.replaceChildren('');
-            puntosR2 = [];
             obs.pos.z -= h;
-            puntosR3.forEach( (elem) => {
-                puntosR2.push( new PuntoR2(elem) );
-            });
-            console.log(puntosR2);
-            for(let i = 0; i < puntosR2.length - 1; i++) {
-                for( let j = 0; j < puntosR2.length; j++ )
-                    new LineaR2( puntosR2[i], puntosR2[j] );
-            }
+            renderR2();
         }, t);
         t += deltaT;
     }
 }
 
 acercarse();
+
+
