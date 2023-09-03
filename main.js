@@ -1,5 +1,6 @@
 const grafico = document.querySelector('.grafico');
-const angGiro = 0.08819;
+const angGiro = 0.08819,
+    pasoAvance = 1;
 let puntosR3 = [],
     puntosR2 = [];
 
@@ -146,15 +147,27 @@ const girarArriba = () => {
     v = prodVectorial( obs.dir, u );
 }
 const girarAbajo = () => {
-    
+    const vecGiro = prodConEscalar( vectorOpuesto(v), angGiro );
+    obs.dir = sumaVec( obs.dir, vecGiro );
+    obs.dir = convertirAUnitario( obs.dir );
+    v = prodVectorial( obs.dir, u );
 }
 const girarIzq = () => {
-
+    const vecGiro = prodConEscalar( u, angGiro );
+    obs.dir = sumaVec( obs.dir, vecGiro );
+    obs.dir = convertirAUnitario( obs.dir );
+    u = prodVectorial( v, obs.dir );
 }
 const girarDer = () => {
-
+    const vecGiro = prodConEscalar( vectorOpuesto(u), angGiro );
+    obs.dir = sumaVec( obs.dir, vecGiro );
+    obs.dir = convertirAUnitario( obs.dir );
+    u = prodVectorial( v, obs.dir );
 }
-
+const avanzar = () => {
+    const vecAvance = prodConEscalar( obs.dir, pasoAvance );
+    obs.pos = sumaVec( obs.pos, vecAvance );
+}
 
 grafico.addEventListener("keydown", (e) => {
     switch(e.key) {
@@ -166,7 +179,11 @@ grafico.addEventListener("keydown", (e) => {
             break;
         case 'ArrowRight': girarDer();
             break;
+        case 'w': ;
+        case 'W': avanzar();
+            break;
     }
+    renderR2();
 });
 
 const acercarse = () => {
@@ -182,6 +199,6 @@ const acercarse = () => {
     }
 }
 
-acercarse();
+// acercarse();
 
 
