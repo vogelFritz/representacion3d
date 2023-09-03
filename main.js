@@ -84,7 +84,7 @@ class PuntoR2 {
                 this.x = ( v.z * ( ptoR3.y - origenR3.y ) - v.y * ( ptoR3.z - origenR3.z ) ) / (-aux);
             }
         }
-        this.x = (this.x / dist) * grafico.offsetWidth;
+        this.x = (this.x / dist) * grafico.offsetHeight;
         this.y = (this.y / dist) * grafico.offsetHeight;
         this.divHTML = document.createElement('div');
         this.divHTML.className = 'punto';
@@ -135,6 +135,10 @@ const crearPlano = ( ptoInicial ) => {
     puntosR3.push( new PuntoR3( ptoInicial.x, ptoInicial.y + lado, ptoInicial.z ) );
     puntosR3.push( new PuntoR3( ptoInicial.x, ptoInicial.y, ptoInicial.z + lado ) );
     puntosR3.push( new PuntoR3( ptoInicial.x, ptoInicial.y + lado, ptoInicial.z + lado ) );
+}
+
+const crearTetraedro = ( ptoInicial ) => {
+
 }
 
 crearPlano( new PuntoR3(0,0,0) );
@@ -224,4 +228,7 @@ const acercarse = () => {
 
 // acercarse();
 
+
+// TODO: Las dimensiones del gráfico están deformando las formas 
+// TODO: Se mira hacia adelante y hacia atrás al mismo tiempo
 
