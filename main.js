@@ -169,6 +169,20 @@ const avanzar = () => {
     obs.pos = sumaVec( obs.pos, vecAvance );
 }
 
+const retroceder = () => {
+    const vecRet = prodConEscalar( obs.dir, -pasoAvance );
+    obs.pos = sumaVec( obs.pos, vecRet );
+}
+
+const moverIzq = () => {
+    const vecAvance = prodConEscalar( u, pasoAvance );
+    obs.pos = sumaVec( obs.pos, vecAvance );
+}
+const moverDer = () => {
+    const vecAvance = prodConEscalar( u, -pasoAvance );
+    obs.pos = sumaVec( obs.pos, vecAvance );
+}
+
 grafico.addEventListener("keydown", (e) => {
     switch(e.key) {
         case 'ArrowUp': girarArriba();
@@ -181,6 +195,15 @@ grafico.addEventListener("keydown", (e) => {
             break;
         case 'w': ;
         case 'W': avanzar();
+            break;
+        case 's': ;
+        case 'S': retroceder();
+            break;
+        case 'a': ;
+        case 'A': moverIzq();
+            break;
+        case 'd': ;
+        case 'D': moverDer();
             break;
     }
     renderR2();
