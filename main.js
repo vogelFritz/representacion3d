@@ -6,6 +6,7 @@ let puntosR3 = [],
 
 const posGraficoY = ( y ) => grafico.offsetHeight / 2. - y;
 const posGraficoX = ( x ) => grafico.offsetWidth / 2. - x;
+// De este modo, X positivo está definido hacia la izquierda, Y positivo hacia arriba
 
 class PuntoR3 {
     x;
@@ -17,6 +18,8 @@ class PuntoR3 {
         this.z = z;
     }
 }
+
+// Operaciones con vectores
 
 const convertirAUnitario = ( vec ) => {
     const aux = Math.sqrt( 1. / (vec.x ** 2. + vec.y ** 2. + vec.z ** 2.) );
@@ -127,22 +130,44 @@ const renderR2 = () => {
         for( let j = 0; j < puntosR2.length; j++ )
             new LineaR2( puntosR2[i], puntosR2[j] );
     }
+    console.clear();
+    console.log( obs, puntosR3 );
 }
 
-const crearPlano = ( ptoInicial ) => {
-    const lado = 10;
-    puntosR3.push( ptoInicial );
-    puntosR3.push( new PuntoR3( ptoInicial.x, ptoInicial.y + lado, ptoInicial.z ) );
-    puntosR3.push( new PuntoR3( ptoInicial.x, ptoInicial.y, ptoInicial.z + lado ) );
-    puntosR3.push( new PuntoR3( ptoInicial.x, ptoInicial.y + lado, ptoInicial.z + lado ) );
+// Formas
+// TODO: Crear clases para las formas, así va a ser fácil hacer operaciones con estas
+
+class Plano {
+    puntosR3 = [];
+    constructor( ptoInicial ) {
+        const lado = 10;
+        this.puntosR3.push( ptoInicial );
+        this.puntosR3.push( new PuntoR3( ptoInicial.x, ptoInicial.y + lado, ptoInicial.z ) );
+        this.puntosR3.push( new PuntoR3( ptoInicial.x, ptoInicial.y, ptoInicial.z + lado ) );
+        this.puntosR3.push( new PuntoR3( ptoInicial.x, ptoInicial.y + lado, ptoInicial.z + lado ) );
+        puntosR3 = puntosR3.concat( this.puntosR3 );
+    }
 }
 
-const crearTetraedro = ( ptoInicial ) => {
-
+class Tetraedro {
+    puntosR3 = [];
+    constructor( ptoInicial ) {
+        const lado = 10,
+              angulo = Math.sqrt( 3. );
+        this.puntosR3.push( ptoInicial );
+        this.puntosR3.push( sumaVec( ptoInicial, prodConEscalar( u, angulo ) ) );
+        this.puntosR3.push( sumaVec( ptoInicial, prodConEscalar( v, angulo ) ) );
+        this.puntosR3.push( sumaVec( ptoInicial, prodConEscalar( obs.dir, -angulo ) ) );
+        puntosR3 = puntosR3.concat( this.puntosR3 );
+    }
 }
 
-crearPlano( new PuntoR3(0,0,0) );
+// new Plano( new PuntoR3(0,0,0) );
+// new Plano( new PuntoR3(-10,0,0) );
+new Tetraedro( new PuntoR3(0,0,0) );
 renderR2();
+
+// Movimiento
 
 const girarArriba = () => {
     const vecGiro = prodConEscalar(v, angGiro);
@@ -213,22 +238,5 @@ grafico.addEventListener("keydown", (e) => {
     renderR2();
 });
 
-const acercarse = () => {
-    const h = 0.0167,
-          deltaT = 16.67;
-    let t = 0;
-    for( let i = 0; i < 1000; i++ ) {
-        setTimeout(() => {
-            obs.pos.z -= h;
-            renderR2();
-        }, t);
-        t += deltaT;
-    }
-}
-
-// acercarse();
-
-
-// TODO: Las dimensiones del gráfico están deformando las formas 
 // TODO: Se mira hacia adelante y hacia atrás al mismo tiempo
 
